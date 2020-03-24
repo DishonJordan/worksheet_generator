@@ -1,8 +1,22 @@
 from fpdf import FPDF
 
 FILE = 'problems.txt'
-TITLE = 'Problem Set 1'
-PDF_NAME = TITLE + ".pdf"
+
+
+class ProblemObject:
+
+    title = 'default'
+    problems_and_lines = []
+
+    def __init__(self, title, problems_and_lines):
+        self.title = title
+        self.problems_and_lines = problems_and_lines
+
+    def get_problem(self, index):
+        return self.problems_and_lines[index][0]
+
+    def get_lines(self, index):
+        return int(self.problems_and_lines[index][1])
 
 
 class PDF(FPDF):
@@ -29,28 +43,37 @@ class PDF(FPDF):
         self.ln()
 
     def print_problem(self, num, content, lines):
+        print(lines, content)
         self.add_problem(num, content)
-        self.ln(int(lines) * 5)
+        self.ln(lines * 5)
 
 
 def read_pages(file):
-
-    problem_list = []
     f = open(file)
+    i = 0
+    title = ''
+    problems = []
+
     for line in f:
-        problem_list.append(line)
-    return problem_list
+        if i is 0:
+            title = line.strip()
+        else:
+            line_split = line.split(" ", 1)
+            problems.append((line_split[1], line_split[0]))
+        i += 1
+
+    p = ProblemObject(title, problems)
+
+    return p
 
 
 pdf = PDF()
-pdf.set_title(TITLE)
+problems = read_pages(FILE)
+pdf.set_title(problems.title)
+print()
 pdf.add_page()
 
-problems = read_pages(FILE)
+for i in range(0, len(problems.problems_and_lines)):
+    pdf.print_problem(i + 1, problems.get_problem(i), problems.get_lines(i))
 
-for i in range(0, len(problems)):
-    line = problems[i].split(" ", 1)
-    print(line[0], line[1])
-    pdf.print_problem(i + 1, line[1], line[0])
-
-pdf.output(PDF_NAME, 'F')
+pdf.output(problems.title + '.pdf', 'F')
