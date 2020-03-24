@@ -43,7 +43,6 @@ class PDF(FPDF):
         self.ln()
 
     def print_problem(self, num, content, lines):
-        print(lines, content)
         self.add_problem(num, content)
         self.ln(lines * 5)
 
@@ -70,7 +69,6 @@ def read_pages(file):
 pdf = PDF()
 problems = read_pages(FILE)
 pdf.set_title(problems.title)
-print()
 pdf.add_page()
 
 for i in range(0, len(problems.problems_and_lines)):
