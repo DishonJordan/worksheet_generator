@@ -2,7 +2,7 @@ from fpdf import FPDF
 
 FILE = 'problems.txt'
 TITLE = 'Problem Set 1'
-PDF_NAME = 'problems.pdf'
+PDF_NAME = TITLE + ".pdf"
 
 
 class PDF(FPDF):
@@ -10,7 +10,7 @@ class PDF(FPDF):
         self.set_font('Courier', 'B', 15)
         w = self.get_string_width(self.title) + 6
         self.set_x((210 - w) / 2)
-        self.cell(w, 9, self.title, 0, 1, 'L')
+        self.cell(0, 9, self.title, 0, 1, 'L')
         self.ln(10)
 
     def footer(self):
@@ -28,9 +28,9 @@ class PDF(FPDF):
         self.multi_cell(0, 4, str(num) + ". " + content)
         self.ln()
 
-    def print_problem(self, num, content):
-        self.add_page()
+    def print_problem(self, num, content, lines):
         self.add_problem(num, content)
+        self.ln(int(lines) * 5)
 
 
 def read_pages(file):
@@ -44,10 +44,13 @@ def read_pages(file):
 
 pdf = PDF()
 pdf.set_title(TITLE)
+pdf.add_page()
 
 problems = read_pages(FILE)
 
 for i in range(0, len(problems)):
-    pdf.print_problem(i + 1, problems[i])
+    line = problems[i].split(" ", 1)
+    print(line[0], line[1])
+    pdf.print_problem(i + 1, line[1], line[0])
 
 pdf.output(PDF_NAME, 'F')
