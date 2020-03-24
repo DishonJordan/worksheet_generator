@@ -1,10 +1,31 @@
 from fpdf import FPDF
 
+FILE = 'problems.txt'
+TITLE = 'Problem Set 1'
+PDF_NAME = 'problems.pdf'
+
 
 class PDF(FPDF):
+    def header(self):
+        self.set_font('Courier', 'B', 15)
+        w = self.get_string_width(self.title) + 6
+        self.set_x((210 - w) / 2)
+        self.cell(w, 9, self.title, 0, 1, 'L')
+        self.ln(10)
+
+    def footer(self):
+        # Position at 1.5 cm from bottom
+        self.set_y(-15)
+        # Arial italic 8
+        self.set_font('Courier', 'I', 8)
+        # Text color in gray
+        self.set_text_color(128)
+        # Page number
+        self.cell(0, 10, 'Page ' + str(self.page_no()), 0, 0, 'C')
+
     def add_problem(self, num, content):
-        self.set_font("Times", '', 12)
-        self.multi_cell(0, 5, content)
+        self.set_font('Courier', '', 12)
+        self.multi_cell(0, 4, str(num) + ". " + content)
         self.ln()
 
     def print_problem(self, num, content):
@@ -12,14 +33,21 @@ class PDF(FPDF):
         self.add_problem(num, content)
 
 
-pdf = PDF()
-pdf.set_title("Problem Set 1")
+def read_pages(file):
 
-problems = ["Ariel was playing basketball. 1 of her shots went in the hoop. 2 of her shots did not go in the hoop. How many shots were there in total?",
-            "Adrianna has 10 pieces of gum to share with her friends. There wasn’t enough gum for all her friends, so she went to the store to get 3 more pieces of gum. How many pieces of gum does Adrianna have now?"
-            "How many cookies did you sell if you sold 320 chocolate cookies and 270 vanilla cookies?"]
+    problem_list = []
+    f = open(file)
+    for line in f:
+        problem_list.append(line)
+    return problem_list
+
+
+pdf = PDF()
+pdf.set_title(TITLE)
+
+problems = read_pages(FILE)
 
 for i in range(0, len(problems)):
     pdf.print_problem(i + 1, problems[i])
 
-pdf.output('ps123.pdf', 'F')
+pdf.output(PDF_NAME, 'F')
